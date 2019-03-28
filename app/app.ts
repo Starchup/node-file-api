@@ -1,15 +1,36 @@
 // lib/app.ts
 import express = require("express");
+import
+{
+	FileWatcher,
+	FileWatcherDelegate
+}
+from "./classes/FileWatcher";
+import
+{
+	FileWritter
+}
+from "./classes/FileWritter";
 
 // Create a new express application instance
 const app: express.Application = express();
 
-app.get("/", (req, res) =>
+
+const testRead = new FileWatcher('test.txt', (data) =>
 {
-	res.send("Hello World!");
+	console.log('got delegate data');
+	console.log(data);
 });
 
-app.listen(3000, () =>
+const testWrite = new FileWritter('test.txt');
+
+
+app.get("/", (req, res) =>
 {
-	console.log("Example app listening on port 3000!");
+	testWrite.writeData(req.query.data).then((result) =>
+	{
+		res.send("Result: " + result);
+	});
 });
+
+app.listen(3000);
