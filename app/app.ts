@@ -1,5 +1,3 @@
-// lib/app.ts
-import express = require("express");
 import
 {
 	FileWatcher,
@@ -12,25 +10,28 @@ import
 }
 from "./classes/FileWritter";
 
-// Create a new express application instance
-const app: express.Application = express();
-
-
-const testRead = new FileWatcher('test.txt', (data) =>
+import
 {
-	console.log('got delegate data');
-	console.log(data);
-});
+	Server,
+	ServerDelegate
+}
+from "./classes/Server";
 
-const testWrite = new FileWritter('test.txt');
 
-
-app.get("/", (req, res) =>
+const server = new Server(3000, (request) =>
 {
-	testWrite.writeData(req.query.data).then((result) =>
+	if (request.method === 'GET' && request.url === '/')
 	{
-		res.send("Result: " + result);
-	});
-});
+		return Promise.resolve('OK');
+	}
+	if (request.method === 'POST' && request.url === '/watchFile')
+	{
+		return Promise.resolve(JSON.stringify(request.body));
+	}
+	if (request.method === 'POST' && request.url === '/writeFile')
+	{
+		return Promise.resolve(JSON.stringify(request.body));
+	}
 
-app.listen(3000);
+	throw new Error('Method or URL invalid');
+});
