@@ -10,5 +10,7 @@ WORKDIR /app
 
 RUN npm install
 
-ENTRYPOINT ["node", "app/app.ts"]
+RUN 
+
+ENTRYPOINT ["node", "run dev"]
 
