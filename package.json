@@ -1,6 +1,6 @@
 {
 	"name": "node-file-api",
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"description": "RESTful API to file IO",
 	"main": "build/app.js",
 	"scripts":
