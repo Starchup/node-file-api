@@ -35,32 +35,32 @@ steps:
     path: /root/.ssh
 
         # Grab the main deploy script
-- name: "glesage/google-cloud-deployment"
-  args: ['scp', '-i', '/root/.ssh/id_rsa', '-o', 'StrictHostKeyChecking=no', '-o', 'UserKnownHostsFile=/dev/null', 'root@stage.starchup.com:/root/deployments/gcb_deploy.sh', './gcb_deploy.sh']
-  volumes:
-  - name: 'creds'
-    path: /root/.ssh
+#- name: "glesage/google-cloud-deployment"
+#  args: ['scp', '-i', '/root/.ssh/id_rsa', '-o', 'StrictHostKeyChecking=no', '-o', 'UserKnownHostsFile=/dev/null', 'root@stage.starchup.com:/root/deployments/gcb_deploy.sh', './gcb_deploy.sh']
+#  volumes:
+#  - name: 'creds'
+#    path: /root/.ssh
 
     # run the deploy script
-- name: "glesage/google-cloud-deployment"
-  args: ['bash', './gcb_deploy.sh']
-  env:
-  - 'REPO=$REPO_NAME'
-  - 'BRANCH=$BRANCH_NAME'
-  - 'COMMIT=$REVISION_ID'
-  volumes:
-  - name: 'creds'
-    path: /root/.ssh
+#- name: "glesage/google-cloud-deployment"
+#  args: ['bash', './gcb_deploy.sh']
+#  env:
+#  - 'REPO=$REPO_NAME'
+#  - 'BRANCH=$BRANCH_NAME'
+#  - 'COMMIT=$REVISION_ID'
+#  volumes:
+#  - name: 'creds'
+#    path: /root/.ssh
 
        # building the node app
-- name: "gcr.io/cloud-builders/npm"
-  args: ['install']
+#- name: "gcr.io/cloud-builders/npm"
+#  args: ['install']
 
        # building the node app
-- name: "gcr.io/cloud-builders/npm"
-  args: ['run']
-  env:
-  - 'NODE_ENV=prod'
+#- name: "gcr.io/cloud-builders/npm"
+#  args: ['run']
+#  env:
+#  - 'NODE_ENV=prod'
 
 
        # Build the image on GCB
@@ -74,22 +74,22 @@ steps:
 
  
         # Grab the kubectl commands script
-- name: "glesage/google-cloud-deployment"
-  args: ['scp', '-i', '/root/.ssh/id_rsa', '-o', 'StrictHostKeyChecking=no', '-o', 'UserKnownHostsFile=/dev/null', 'root@stage.starchup.com:/root/deployments/gcloud/k8s.sh', '/workspace/k8s.sh']
-  volumes:
-  - name: 'creds'
-    path: /root/.ssh
+#- name: "glesage/google-cloud-deployment"
+#  args: ['scp', '-i', '/root/.ssh/id_rsa', '-o', 'StrictHostKeyChecking=no', '-o', 'UserKnownHostsFile=/dev/null', 'root@stage.starchup.com:/root/deployments/gcloud/k8s.sh', '/workspace/k8s.sh']
+#  volumes:
+#  - name: 'creds'
+#    path: /root/.ssh
 
         # run the gcloud/kubectl commands
-- name: "glesage/google-cloud-deployment"
-  args: ['bash', '/workspace/k8s.sh']
-  env:
-  - 'REPO=$REPO_NAME'
-  - 'BRANCH=$BRANCH_NAME'
-  - 'COMMIT=$REVISION_ID'
-  volumes:
-  - name: 'creds'
-    path: /root/.ssh
+#- name: "glesage/google-cloud-deployment"
+#  args: ['bash', '/workspace/k8s.sh']
+#  env:
+#  - 'REPO=$REPO_NAME'
+#  - 'BRANCH=$BRANCH_NAME'
+#  - 'COMMIT=$REVISION_ID'
+#  volumes:
+#  - name: 'creds'
+#    path: /root/.ssh
 
 images: ['gcr.io/starchup-147119/$REPO_NAME:$REVISION_ID']
 
