@@ -42,7 +42,7 @@ steps:
     path: /root/.ssh
 
        # building the node app
-- name: "gcr.io/cloud-builders/"
+- name: "gcr.io/cloud-builders/npm"
   args: ['bash', 'node run prod']
 
     # run the deploy script
