@@ -6,6 +6,8 @@ NodeJS IO to API converter
 The NFA is meant to be a modern interface for the old IO API that consisted of writting and reading files to a shared directory. This NodeJS API will translate those file IO operations from and to JSON through API endpoints and with Google pubsub.
 
 ### Environment Variables
+`NODE_ENV` to use with pubsub
+`GCLOUD_PROJECT` to use with pubsub
 `FILE_API_PORT` to define it's port
 `FILE_API_DIRECTORY` to define the directory where the files need to go (without trailing slash.. so ex: /var/www)
 

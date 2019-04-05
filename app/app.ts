@@ -17,6 +17,16 @@ import
 }
 from "./classes/Server";
 
+import
+{
+	PubSubEmitter
+}
+from "./classes/PubSubEmitter";
+
+
+/**
+ * Interfaces and local definitions
+ */
 interface WriterList
 {
 	[key: string]: FileWriter;
@@ -30,14 +40,29 @@ declare var process:
 {
 	env:
 	{
+		NODE_ENV: string,
 		FILE_API_PORT: number,
+		GCLOUD_PROJECT: string,
 		FILE_API_DIRECTORY: string
 	}
 }
 
+if (!process.env.NODE_ENV || process.env.NODE_ENV.length < 1) throw new Error('NODE_ENV is required');
+if (!process.env.FILE_API_PORT || process.env.FILE_API_PORT < 0) throw new Error('FILE_API_PORT is required');
+if (!process.env.GCLOUD_PROJECT || process.env.GCLOUD_PROJECT.length < 1) throw new Error('GCLOUD_PROJECT is required');
+if (!process.env.FILE_API_DIRECTORY || process.env.FILE_API_DIRECTORY.length < 1) throw new Error('FILE_API_DIRECTORY is required');
+
+/**
+ * Global variables
+ */
+const emitter: PubSubEmitter = new PubSubEmitter(process.env.GCLOUD_PROJECT);
+
 const readers: ReaderList = {};
 const writers: WriterList = {};
 
+/**
+ * Main server implementation
+ */
 const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 {
 	// Handle Status method
@@ -55,7 +80,7 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 		{
 			new FileWatcher(filePath(request.body.fileName), (data: string) =>
 			{
-				console.error('Server watchFile read data: ' + data);
+				emitter.send(process.env.NODE_ENV, request.body.fileName, data);
 			});
 		}
 		return Promise.resolve('OK');
