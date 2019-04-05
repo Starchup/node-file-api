@@ -1,4 +1,4 @@
-type PromiseCallback = (arg: string) => void;
+type PromiseCallback = () => void;
 type PromiseErrCallback = (arg: Error) => void;
 
 export class FileWriter

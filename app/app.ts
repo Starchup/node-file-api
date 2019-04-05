@@ -26,6 +26,14 @@ interface ReaderList
 	[key: string]: FileWatcher;
 }
 
+declare var process:
+{
+	env:
+	{
+		FILE_API_PORT: number
+	}
+}
+
 const readers: ReaderList = {};
 const writers: WriterList = {};
 
@@ -46,7 +54,7 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 				console.error('Server watchFile read data: ' + data);
 			});
 		}
-		return 'OK';
+		return Promise.resolve('OK');
 	}
 	if (request.method === 'POST' && request.url === '/writeFile')
 	{
