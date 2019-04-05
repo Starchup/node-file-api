@@ -10,7 +10,6 @@ WORKDIR /app
 
 RUN npm install
 
-RUN 
 
 ENTRYPOINT ["node", "run dev"]
 
