@@ -8,5 +8,4 @@ MAINTAINER matt@starchup.com
 RUN npm install
 
 
-ENTRYPOINT ["node", "run dev"]
-
+RUN node run dev
