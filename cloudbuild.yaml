@@ -58,7 +58,9 @@ steps:
 
        # building the node app
 - name: "gcr.io/cloud-builders/npm"
-  args: ['run', 'prod']
+  args: ['run']
+  env:
+  - 'NODE_ENV=prod'
 
 
        # Build the image on GCB
