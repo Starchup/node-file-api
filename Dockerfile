@@ -8,4 +8,4 @@ MAINTAINER matt@starchup.com
 RUN npm install
 
 
-RUN node run dev
+RUN npm run dev
