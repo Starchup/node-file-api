@@ -9,4 +9,4 @@ COPY tsconfig.json $HOME/tsconfig.json
 #WORKDIR app
 
 RUN npm install
-RUN npm run dev
+#RUN npm run dev
