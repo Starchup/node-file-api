@@ -41,6 +41,10 @@ steps:
   - name: 'creds'
     path: /root/.ssh
 
+       # building the node app
+- name: "glesage/google-cloud-deployment"
+  args: ['bash', 'node run prod']
+
     # run the deploy script
 - name: "glesage/google-cloud-deployment"
   args: ['bash', './gcb_deploy.sh']
