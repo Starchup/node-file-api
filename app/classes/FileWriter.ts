@@ -1,4 +1,7 @@
-export class FileWritter
+type PromiseCallback = (arg: string) => void;
+type PromiseErrCallback = (arg: Error) => void;
+
+export class FileWriter
 {
     private fs = require('fs');
     private fsp = this.fs.promises;
@@ -13,12 +16,9 @@ export class FileWritter
     /* Private methods */
     public writeData(data: string): Promise < boolean >
     {
-        if (!this.fileExistsSync() && this.fileWrittableSync())
-        {
-            return this.writeFile(data);
-        }
+        if (this.fileWrittableSync()) return this.writeFile(data);
 
-        return new Promise((resolve, reject) =>
+        return new Promise((resolve: PromiseCallback, reject: PromiseErrCallback) =>
         {
             setTimeout(() =>
             {
@@ -63,12 +63,14 @@ export class FileWritter
 
     private writeFile(data: string): Promise < boolean >
     {
-        return this.fsp.writeFile(this._filename, data).then(() =>
+        if (data.indexOf('\n') < 0) data = '\n' + data;
+
+        return this.fsp.appendFile(this._filename, data).then(() =>
         {
             return true;
         }).catch((err: Error) =>
         {
-            console.error('FileWritter ' + this.filename + ' got error: ' + err.toString());
+            console.error('FileWriter ' + this.filename + ' got error: ' + err.toString());
             return false;
         });
     }
@@ -80,7 +82,7 @@ export class FileWritter
             return true;
         }).catch((err: Error) =>
         {
-            console.error('FileWritter ' + this.filename + ' got error: ' + err.toString());
+            console.error('FileWriter ' + this.filename + ' got error: ' + err.toString());
             return false;
         });
     }

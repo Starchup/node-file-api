@@ -5,6 +5,9 @@ export interface ServerDelegate
 	(request: object): Promise < string > ;
 }
 
+type PromiseCallback = (arg: string) => void;
+type PromiseErrCallback = (arg: Error) => void;
+
 export class Server
 {
 	constructor(public port: number, public delegate: ServerDelegate)
@@ -78,7 +81,7 @@ export class Server
 		if (!request.url) return Promise.resolve('');
 
 		const hashes = request.url.slice(request.url.indexOf("?") + 1).split("&");
-		const data = hashes.reduce((params, hash) =>
+		const data = hashes.reduce((params: object, hash: string) =>
 		{
 			const split = hash.indexOf("=");
 
@@ -113,7 +116,7 @@ export class Server
 		{
 			return Promise.reject(new Error('Request was not JSON'));
 		}
-		return new Promise((resolve, reject) =>
+		return new Promise((resolve: PromiseCallback, reject: PromiseErrCallback) =>
 		{
 			let body = '';
 			request.on('data', chunk =>

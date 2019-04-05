@@ -16,8 +16,6 @@ export class FileWatcher
 
         setInterval(() =>
         {
-            console.log('checking');
-
             if (!this.fileReadableSync()) return;
 
             this.readFile().then((data: string) =>

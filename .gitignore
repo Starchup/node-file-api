@@ -42,3 +42,4 @@ db.json
 
 package-lock.json
 build/app.js
+*.txt
