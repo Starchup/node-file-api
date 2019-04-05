@@ -30,7 +30,8 @@ declare var process:
 {
 	env:
 	{
-		FILE_API_PORT: number
+		FILE_API_PORT: number,
+		FILE_API_DIRECTORY: string
 	}
 }
 
@@ -52,7 +53,7 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 
 		if (!readers[request.body.fileName])
 		{
-			new FileWatcher(request.body.fileName, (data: string) =>
+			new FileWatcher(filePath(request.body.fileName), (data: string) =>
 			{
 				console.error('Server watchFile read data: ' + data);
 			});
@@ -86,3 +87,8 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 
 	throw new Error('Method or URL invalid');
 });
+
+const filePath = function (fileName: string): string
+{
+	return process.env.FILE_API_DIRECTORY + '/' + fileName;
+}
