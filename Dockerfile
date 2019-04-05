@@ -4,7 +4,8 @@ MAINTAINER matt@starchup.com
 
 WORKDIR /app/
 
-COPY package.json $HOME/package.json
+COPY package.json app/package.json
+COPY tsconfig.json app/tsconfig.json
 
 
 RUN npm install
