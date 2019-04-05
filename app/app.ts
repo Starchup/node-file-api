@@ -29,7 +29,7 @@ interface ReaderList
 const readers: ReaderList = {};
 const writers: WriterList = {};
 
-const server = new Server(3000, (request: any) =>
+const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 {
 	if (request.method === 'GET' && request.url === '/')
 	{
