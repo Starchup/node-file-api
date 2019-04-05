@@ -6,7 +6,6 @@
 	"scripts":
 	{
 		"tsc": "tsc",
-		"prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
 		"dev": "ts-node-dev --respawn --transpileOnly ./app/app.ts",
 		"prod": "tsc && node ./build/app.js"
 	},
@@ -20,8 +19,6 @@
 	"devDependencies":
 	{
 		"ts-node-dev": "1.0.0-pre.32",
-		"tslint": "5.14.0",
-		"tslint-eslint-rules": "5.4.0",
 		"typescript": "3.3.4000"
 	}
 }
