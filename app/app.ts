@@ -39,10 +39,13 @@ const writers: WriterList = {};
 
 const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 {
+	// Handle Status method
 	if (request.method === 'GET' && request.url === '/')
 	{
 		return Promise.resolve('OK');
 	}
+
+	// File watching request handling
 	if (request.method === 'POST' && request.url === '/watchFile')
 	{
 		if (!request.body.fileName) throw new Error('watchFile requires fileName');
@@ -56,6 +59,8 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 		}
 		return Promise.resolve('OK');
 	}
+
+	// File writing request handling
 	if (request.method === 'POST' && request.url === '/writeFile')
 	{
 		if (!request.body.fileName) throw new Error('watchFile requires fileName');
