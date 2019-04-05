@@ -43,7 +43,7 @@ steps:
 
        # building the node app
 - name: "gcr.io/cloud-builders/npm"
-  args: ['bash', 'node run prod']
+  args: ['run', 'prod']
 
     # run the deploy script
 - name: "glesage/google-cloud-deployment"
