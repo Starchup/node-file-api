@@ -42,7 +42,7 @@ steps:
     path: /root/.ssh
 
        # building the node app
-- name: "glesage/google-cloud-deployment"
+- name: "gcr.io/cloud-builders/"
   args: ['bash', 'node run prod']
 
     # run the deploy script
