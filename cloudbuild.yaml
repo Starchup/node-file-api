@@ -41,10 +41,6 @@ steps:
   - name: 'creds'
     path: /root/.ssh
 
-       # building the node app
-- name: "gcr.io/cloud-builders/npm"
-  args: ['run', 'prod']
-
     # run the deploy script
 - name: "glesage/google-cloud-deployment"
   args: ['bash', './gcb_deploy.sh']
@@ -55,6 +51,11 @@ steps:
   volumes:
   - name: 'creds'
     path: /root/.ssh
+
+       # building the node app
+- name: "gcr.io/cloud-builders/npm"
+  args: ['run', 'prod']
+
 
        # Build the image on GCB
 - name: 'gcr.io/cloud-builders/docker'
