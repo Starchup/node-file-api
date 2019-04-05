@@ -4,7 +4,7 @@ MAINTAINER matt@starchup.com
 
 
 COPY package.json app/package.json
-COPY tsconfig.json
+COPY tsconfig.json app/tsconfig.json
 
 WORKDIR /app
 
