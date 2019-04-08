@@ -8,5 +8,5 @@ COPY tsconfig.json $HOME/tsconfig.json
 COPY node_modules/ $HOME/node_modules/
 COPY build/ $HOME/build/
 
-ENTRYPOINT ["sh", "-c", "ls -lah ./build/"]
-#ENTRYPOINT ["node", "./build/app.ts"]
+#ENTRYPOINT ["sh", "-c", "ls -lah ./build/"]
+ENTRYPOINT ["node", "./build/app.js"]
