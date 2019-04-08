@@ -5,8 +5,8 @@ MAINTAINER matt@starchup.com
 COPY app  $HOME/app
 COPY package.json $HOME/package.json
 COPY tsconfig.json $HOME/tsconfig.json
-COPY workspace/node_modules $HOME/node_modules
-COPY workspace/build $HOME/build
+COPY node_modules $HOME/node_modules
+COPY build $HOME/build
 
-ENTRYPOINT ["sh", "-c", "find -type d -name build"]
-#ENTRYPOINT ["node", "/build/app.ts"]
+#ENTRYPOINT ["sh", "-c", "find -type d -name build"]
+ENTRYPOINT ["node", "./build/app.ts"]
