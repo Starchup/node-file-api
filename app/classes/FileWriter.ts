@@ -6,14 +6,14 @@ export class FileWriter
     private fs = require('fs');
     private fsp = this.fs.promises;
 
-    private _filename: string;
+    private _fileName: string;
 
-    constructor(public filename: string)
+    constructor(public fileName: string)
     {
-        this._filename = filename;
+        this._fileName = fileName;
 
         const res = !this.setupDirectories();
-        if (!res) throw new Error('Could not setup directories for ' + this._filename);
+        if (!res) throw new Error('Could not setup directories for ' + this._fileName);
     }
 
     /* Private methods */
@@ -42,7 +42,7 @@ export class FileWriter
     {
         try
         {
-            this.fs.accessSync(this._filename, this.fs.F_OK);
+            this.fs.accessSync(this._fileName, this.fs.F_OK);
         }
         catch (e)
         {
@@ -58,7 +58,7 @@ export class FileWriter
     {
         try
         {
-            this.fs.accessSync(this._filename, this.fs.W_OK);
+            this.fs.accessSync(this._fileName, this.fs.W_OK);
         }
         catch (e)
         {
@@ -86,24 +86,24 @@ export class FileWriter
     {
         if (data.indexOf('\n') < 0) data = '\n' + data;
 
-        return this.fsp.appendFile(this._filename, data).then(() =>
+        return this.fsp.appendFile(this._fileName, data).then(() =>
         {
             return true;
         }).catch((err: Error) =>
         {
-            console.error('FileWriter ' + this.filename + ' got appendFile error: ' + err.toString());
+            console.error('FileWriter ' + this.fileName + ' got appendFile error: ' + err.toString());
             return false;
         });
     }
 
     private deleteFile(): Promise < boolean >
     {
-        return this.fsp.unlink(this._filename).then(() =>
+        return this.fsp.unlink(this._fileName).then(() =>
         {
             return true;
         }).catch((err: Error) =>
         {
-            console.error('FileWriter ' + this.filename + ' got deleteFile error: ' + err.toString());
+            console.error('FileWriter ' + this.fileName + ' got deleteFile error: ' + err.toString());
             return false;
         });
     }
@@ -111,19 +111,19 @@ export class FileWriter
     // Directory helpers
     private setupDirectories(): boolean
     {
-        if (this.locationExistsSync(this._filename) || this._filename.indexOf('/') < 0)
+        if (this.locationExistsSync(this._fileName) || this._fileName.indexOf('/') < 0)
         {
             return true;
         }
 
-        const directories = this._filename.split('/');
+        const directories = this._fileName.split('/');
         if (directories.length < 2)
         {
-            throw new Error('Could not create subdirectories for filename ' + this._filename);
+            throw new Error('Could not create subdirectories for fileName ' + this._fileName);
         }
 
-        const directoryWithoutFilename = directories.slice(0, directories.length - 1).join('/');
-        if (this.locationExistsSync(directoryWithoutFilename))
+        const directoryWithoutfileName = directories.slice(0, directories.length - 1).join('/');
+        if (this.locationExistsSync(directoryWithoutfileName))
         {
             return true;
         }

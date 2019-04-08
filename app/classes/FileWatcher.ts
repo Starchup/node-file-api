@@ -8,11 +8,11 @@ export class FileWatcher
     private fs = require('fs');
     private fsp = this.fs.promises;
 
-    private _filename: string;
+    private _fileName: string;
 
-    constructor(public filename: string, public delegate: FileWatcherDelegate)
+    constructor(public fileName: string, public delegate: FileWatcherDelegate)
     {
-        this._filename = filename;
+        this._fileName = fileName;
 
         setInterval(() =>
         {
@@ -26,7 +26,7 @@ export class FileWatcher
                 });
             }).catch((err: Error) =>
             {
-                console.error('FileWatcher ' + filename + ' got error: ' + err.toString());
+                console.error('FileWatcher ' + fileName + ' got error: ' + err.toString());
             });
         }, 2000);
     }
@@ -36,7 +36,7 @@ export class FileWatcher
     {
         try
         {
-            this.fs.accessSync(this._filename, this.fs.R_OK);
+            this.fs.accessSync(this._fileName, this.fs.R_OK);
         }
         catch (e)
         {
@@ -47,11 +47,11 @@ export class FileWatcher
 
     private readFile()
     {
-        return this.fsp.readFile(this._filename);
+        return this.fsp.readFile(this._fileName);
     }
 
     private deleteFile()
     {
-        return this.fsp.unlink(this._filename);
+        return this.fsp.unlink(this._fileName);
     }
 }
