@@ -1,6 +1,6 @@
 FROM mhart/alpine-node:6.5
 
-MAINTAINER matt@starchup.com
+MAINTAINER Matt Jones <matt@starchup.com>
 
 COPY app/  $HOME/app/
 COPY package.json $HOME/package.json
