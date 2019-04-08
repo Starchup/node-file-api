@@ -8,7 +8,6 @@ COPY tsconfig.json $HOME/tsconfig.json
 
 
 RUN npm install
-
-ENTRYPOINT [ "sh", "-c", "find / -type d -name build" ]
+RUN tsc
 
 #ENTRYPOINT ["node", "./build/app.ts"]
