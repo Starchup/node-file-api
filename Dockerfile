@@ -6,9 +6,7 @@ COPY app  $HOME/app
 COPY package.json $HOME/package.json
 COPY tsconfig.json $HOME/tsconfig.json
 
-#WORKDIR app
 
 RUN npm install
-#RUN npm run dev
 
-ENTRYPOINT ["node", "./build/app.ts"]
+#ENTRYPOINT ["node", "./build/app.ts"]
