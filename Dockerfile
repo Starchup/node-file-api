@@ -6,10 +6,8 @@ COPY app  $HOME/app
 COPY package.json $HOME/package.json
 COPY tsconfig.json $HOME/tsconfig.json
 
-RUN npm install typescript
-
 
 RUN npm install
-RUN tsc
+RUN npm run tsc
 
 ENTRYPOINT ["node", "/build/app.ts"]
