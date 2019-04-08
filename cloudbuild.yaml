@@ -53,12 +53,12 @@ steps:
 #    path: /root/.ssh
 
        # building the node app
-#- name: "gcr.io/cloud-builders/npm"
-#  args: ['install']
+- name: "gcr.io/cloud-builders/npm"
+  args: ['install']
 
        # building the node app
-#- name: "gcr.io/cloud-builders/npm"
-#  args: ['run']
+- name: "gcr.io/cloud-builders/npm"
+  args: ['run',"tsc"]
 #  env:
 #  - 'NODE_ENV=prod'
 
