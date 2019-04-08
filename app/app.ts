@@ -90,12 +90,13 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 	if (request.method === 'POST' && request.url === '/writeFile')
 	{
 		if (!request.body.fileName) throw new Error('watchFile requires fileName');
+		if (!request.body.osGroupId) throw new Error('watchFile requires osGroupId');
 		if (!request.body.data) throw new Error('watchFile requires data');
 
 		let writer: FileWriter = writers[request.body.fileName];
 		if (!writer)
 		{
-			writer = new FileWriter(filePath(request.body.fileName));
+			writer = new FileWriter(filePath(request.body.fileName), request.body.osGroupId);
 			writers[request.body.fileName] = writer;
 		}
 

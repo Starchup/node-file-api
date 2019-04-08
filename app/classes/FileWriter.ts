@@ -3,16 +3,25 @@ type PromiseErrCallback = (arg: Error) => void;
 
 export class FileWriter
 {
+    private os = require('os');
     private fs = require('fs');
     private fsp = this.fs.promises;
 
+    private _filePermissions: string = '760';
+
+    private _uid: number;
+    private _gid: number;
     private _fileName: string;
 
-    constructor(public fileName: string)
+    constructor(public fileName: string, gid: number)
     {
-        this._fileName = fileName;
+        process.umask(0);
 
-        const res = !this.setupDirectories();
+        this._fileName = fileName;
+        this._gid = gid;
+        this._uid = this.os.userInfo().uid;
+
+        const res = this.setupDirectories();
         if (!res) throw new Error('Could not setup directories for ' + this._fileName);
     }
 
@@ -131,14 +140,19 @@ export class FileWriter
         directories.forEach((d: string, idx: number) =>
         {
             if (idx === directories.length - 1 || d === '.') return;
-            return this.makeDirectory(directories.slice(0, idx + 1).join('/'));
+            this.makeDirectorySync(
+                directories.slice(0, idx + 1).join('/'),
+                this._uid,
+                this._gid,
+                this._filePermissions);
         });
 
         return this.fileWrittableSync();
     }
 
-    private makeDirectory(pathName: string): void
+    private makeDirectorySync(pathName: string, uid: number, gid: number, permissions: string): void
     {
-        this.fs.mkdir(pathName);
+        this.fs.mkdirSync(pathName, permissions);
+        this.fs.chownSync(pathName, uid, gid);
     }
 }
