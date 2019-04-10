@@ -6,17 +6,20 @@ export class FileWriter
     private fs = require('fs');
     private fsp = this.fs.promises;
 
-    private _filename: string;
+    private _fileName: string;
 
-    constructor(public filename: string)
+    constructor(public fileName: string)
     {
-        this._filename = filename;
+        this._fileName = fileName;
+
+        const fileWritable = this.fileWritableSync();
+        if (!fileWritable) throw new Error('FileWriter file not writable ' + this._fileName);
     }
 
     /* Private methods */
     public writeData(data: string): Promise < boolean >
     {
-        if (this.fileWrittableSync()) return this.writeFile(data);
+        if (this.fileWritableSync()) return this.writeFile(data);
 
         return new Promise((resolve: PromiseCallback, reject: PromiseErrCallback) =>
         {
@@ -30,28 +33,14 @@ export class FileWriter
         });
     }
 
-    /* Private helpers */
-    private fileExistsSync(): boolean
+    /**
+     * Private helpers
+     */
+    private fileWritableSync(): boolean
     {
         try
         {
-            this.fs.accessSync(this._filename, this.fs.F_OK);
-        }
-        catch (e)
-        {
-            if (e.code === 'EACCES') return true;
-            if (e.code === 'ENOENT') return false;
-
-            return false;
-        }
-        return true;
-    }
-
-    private fileWrittableSync(): boolean
-    {
-        try
-        {
-            this.fs.accessSync(this._filename, this.fs.W_OK);
+            this.fs.accessSync(this._fileName, this.fs.W_OK);
         }
         catch (e)
         {
@@ -61,28 +50,17 @@ export class FileWriter
         return true;
     }
 
+    // File helpers
     private writeFile(data: string): Promise < boolean >
     {
         if (data.indexOf('\n') < 0) data = '\n' + data;
 
-        return this.fsp.appendFile(this._filename, data).then(() =>
+        return this.fsp.appendFile(this._fileName, data).then(() =>
         {
             return true;
         }).catch((err: Error) =>
         {
-            console.error('FileWriter ' + this.filename + ' got error: ' + err.toString());
-            return false;
-        });
-    }
-
-    private deleteFile(): Promise < boolean >
-    {
-        return this.fsp.unlink(this._filename).then(() =>
-        {
-            return true;
-        }).catch((err: Error) =>
-        {
-            console.error('FileWriter ' + this.filename + ' got error: ' + err.toString());
+            console.error('FileWriter ' + this.fileName + ' got appendFile error: ' + err.toString());
             return false;
         });
     }

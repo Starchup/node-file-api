@@ -1,5 +1,11 @@
 import
 {
+	ShareManager
+}
+from "./classes/ShareManager";
+
+import
+{
 	FileWatcher,
 	FileWatcherDelegate
 }
@@ -56,6 +62,7 @@ if (!process.env.FILE_API_DIRECTORY || process.env.FILE_API_DIRECTORY.length < 1
  * Global variables
  */
 const emitter: PubSubEmitter = new PubSubEmitter(process.env.GCLOUD_PROJECT);
+const shareManager: ShareManager = new ShareManager();
 
 const readers: ReaderList = {};
 const writers: WriterList = {};
@@ -78,7 +85,7 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 
 		if (!readers[request.body.fileName])
 		{
-			new FileWatcher(filePath(request.body.fileName), (data: string) =>
+			readers[request.body.fileName] = new FileWatcher(filePath(request.body.fileName), (data: string) =>
 			{
 				emitter.send(process.env.NODE_ENV, request.body.fileName, data);
 			});
@@ -95,7 +102,8 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 		let writer: FileWriter = writers[request.body.fileName];
 		if (!writer)
 		{
-			writer = new FileWriter(request.body.fileName);
+			const path = filePath(request.body.fileName);
+			writer = new FileWriter(path);
 			writers[request.body.fileName] = writer;
 		}
 
@@ -106,6 +114,24 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 		}).catch(err =>
 		{
 			console.error('Server /writeFile Error: ' + err.message);
+			throw err;
+		});
+	}
+
+	// File writing request handling
+	if (request.method === 'POST' && request.url === '/setupShare')
+	{
+		if (!request.body.fileName) throw new Error('setupShare requires fileName');
+		if (!request.body.username) throw new Error('setupShare requires username');
+		if (!request.body.password) throw new Error('setupShare requires password');
+
+		return shareManager.setupShare(request.body.fileName, request.body.username, request.body.password).then((result: boolean) =>
+		{
+			if (result) return 'OK';
+			else throw new Error('Could not setup share');
+		}).catch(err =>
+		{
+			console.error('Server /setupShare Error: ' + err.message);
 			throw err;
 		});
 	}
