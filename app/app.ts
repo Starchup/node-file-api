@@ -78,7 +78,7 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 
 		if (!readers[request.body.fileName])
 		{
-			new FileWatcher(filePath(request.body.fileName), (data: string) =>
+			readers[request.body.fileName] = new FileWatcher(filePath(request.body.fileName), (data: string) =>
 			{
 				emitter.send(process.env.NODE_ENV, request.body.fileName, data);
 			});
