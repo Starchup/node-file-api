@@ -7,6 +7,8 @@ export class ShareManager
     private uid = this.os.userInfo().uid;
     private permissions = '760';
 
+    private systemHelper = require('../helpers/system');
+
     constructor()
 
     /* Public methods */
@@ -14,7 +16,7 @@ export class ShareManager
     {
         return this.getGroupId(username).then(gid =>
         {
-            if (!gid) return this.createGroupId(username);
+            if (!gid) return this.createGroupId(username, password);
             else return gid;
         }).then(gid =>
         {
@@ -148,16 +150,11 @@ export class ShareManager
         });
     }
 
-    private createGroupId(groupName: string): Promise < number >
+    private createGroupId(groupname: string, password: string): Promise < number >
     {
-        return this.fsp.readFile('/etc/group').then((data: string) =>
+        return this.systemHelper.createGroup(groupname, password).then(() =>
         {
-            return 0;
-
-        }).catch((err: Error) =>
-        {
-            console.error('ShareManager createGroupId got error: ' + err.toString());
-            return null;
+            return getGroupId(groupname);
         });
     }
 }
