@@ -34,23 +34,16 @@ steps:
   - name: 'creds'
     path: /root/.ssh
 
-        # Grab the main deploy script
-- name: "glesage/google-cloud-deployment"
-  args: ['scp', '-i', '/root/.ssh/id_rsa', '-o', 'StrictHostKeyChecking=no', '-o', 'UserKnownHostsFile=/dev/null', 'root@stage.starchup.com:/root/deployments/gcb_deploy.sh', './gcb_deploy.sh']
-  volumes:
-  - name: 'creds'
-    path: /root/.ssh
+       # building the node app
+- name: "gcr.io/cloud-builders/npm"
+  args: ['install']
 
-    # run the deploy script
-- name: "glesage/google-cloud-deployment"
-  args: ['bash', './gcb_deploy.sh']
-  env:
-  - 'REPO=$REPO_NAME'
-  - 'BRANCH=$BRANCH_NAME'
-  - 'COMMIT=$REVISION_ID'
-  volumes:
-  - name: 'creds'
-    path: /root/.ssh
+       # building the node app
+- name: "gcr.io/cloud-builders/npm"
+  args: ['run',"tsc"]
+#  env:
+#  - 'NODE_ENV=prod'
+
 
        # Build the image on GCB
 - name: 'gcr.io/cloud-builders/docker'
