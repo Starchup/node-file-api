@@ -24,11 +24,17 @@ export class ShareManager
 
             return this.directoryIsSetup(path, gid).then(directoryIsSetup =>
             {
-                if (!directoryIsSetup) return this.setupDirectory(path, gid);
+                if (directoryIsSetup) return true;
+                return this.setupDirectory(path, gid);
+            }).then((res) =>
+            {
+                if (!res) throw new Error('Could not setup directory ' + path);
             });
-        }).then((res) =>
+        }).then(() =>
         {
-            return !!res;
+            const splitPath = path.split('/');
+            const basePath = splitPath.slice(0, splitPath.length - 1).join('/');
+            return this.systemHelper.createSMBShare(username, basePath);
         }).catch(() =>
         {
             return false;
@@ -146,7 +152,6 @@ export class ShareManager
         }).catch((err: Error) =>
         {
             console.error('ShareManager getGroupId got error: ' + err.toString());
-            return;
         });
     }
 
