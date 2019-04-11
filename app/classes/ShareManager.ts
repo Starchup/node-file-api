@@ -34,7 +34,10 @@ export class ShareManager
         {
             const splitPath = path.split('/');
             const basePath = splitPath.slice(0, splitPath.length - 1).join('/');
-            return this.systemHelper.createSMBShare(username, basePath);
+            return this.systemHelper.isSMBShareSetup(username, basePath).then((isSetup) =>
+            {
+                if (!isSetup) return this.systemHelper.createSMBShare(username, basePath);
+            });
         }).catch(() =>
         {
             return false;

@@ -7,7 +7,11 @@ from 'child_process';
 const fs = require('fs');
 
 type PromiseCallback = () => void;
+type PromiseDataCallback = (data: string) => void;
 type PromiseErrCallback = (arg: Error) => void;
+
+
+const _sambaConf = '/etc/samba/smb.conf';
 
 
 export function createGroup(groupname: string, password: string): Promise < void >
@@ -23,21 +27,37 @@ export function createGroup(groupname: string, password: string): Promise < void
 
 export function createSMBShare(groupname: string, path: string): Promise < void >
 {
-    return appendToFile('/etc/samba/smb.conf', '[' + groupname + ']').then(res =>
+    return appendToFile(_sambaConf, '[' + groupname + ']').then(res =>
     {
-        return appendToFile('/etc/samba/smb.conf', 'path = ' + path + '/' + groupname)
+        return appendToFile(_sambaConf, 'path = ' + path)
     }).then(res =>
     {
-        return appendToFile('/etc/samba/smb.conf', 'valid users = ' + groupname)
+        return appendToFile(_sambaConf, 'valid users = ' + groupname)
     }).then(res =>
     {
-        return appendToFile('/etc/samba/smb.conf', 'read only = no')
+        return appendToFile(_sambaConf, 'read only = no')
     }).then(res =>
     {
-        return appendToFile('/etc/samba/smb.conf', '\n')
+        return appendToFile(_sambaConf, '\n')
     }).then(res =>
     {
         return runNoIOCommand('service', ['smbd', 'restart']);
+    });
+}
+
+export function isSMBShareSetup(groupname: string, path: string): Promise < boolean >
+{
+    return readFile(_sambaConf).then(data =>
+    {
+        const hasDefinition: boolean = !!data.split('\n').find(line =>
+        {
+            return line === '[' + groupname + ']';
+        });
+        const hasCorrectPath: boolean = !!data.split('\n').find(line =>
+        {
+            return line === 'path = ' + path;
+        });
+        return hasDefinition && hasCorrectPath;
     });
 }
 
@@ -137,6 +157,18 @@ function runNoIOCommand(command: string, args: Array < string > ): Promise < voi
         {
             if (code === 0) resolve();
             else reject(new Error('Exit code ' + code));
+        });
+    });
+}
+
+function readFile(filepath: string): Promise < string >
+{
+    return new Promise((resolve: PromiseDataCallback, reject: PromiseErrCallback) =>
+    {
+        fs.readFile(filepath, (err: Error, data: string) =>
+        {
+            if (err) reject(err);
+            else resolve(data.toString());
         });
     });
 }
