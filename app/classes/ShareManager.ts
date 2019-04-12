@@ -45,6 +45,7 @@ export class ShareManager
             return this.systemHelper.isSMBShareSetup(username, basePath).then((isSetup: boolean) =>
             {
                 if (!isSetup) return this.systemHelper.createSMBShare(username, basePath);
+                else return true;
             });
         }).catch(() =>
         {
@@ -64,6 +65,9 @@ export class ShareManager
         }).then((res: boolean) =>
         {
             return !!res;
+        }).catch(() =>
+        {
+            return false;
         });
     }
 
@@ -72,6 +76,9 @@ export class ShareManager
         return this.fsp.access(path, this.fs.W_OK).then(() =>
         {
             return true;
+        }).catch(() =>
+        {
+            return false;
         });
     }
 
