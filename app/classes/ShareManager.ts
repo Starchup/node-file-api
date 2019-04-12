@@ -20,7 +20,7 @@ export class ShareManager
     private systemHelper = require('../helpers/system');
 
     /* Public methods */
-    public setupShare(path: string, username: string, password: string): Promise < boolean >
+    public setupShare(directory: string, username: string, password: string): Promise < boolean >
     {
         return this.getGroupId(username).then(gid =>
         {
@@ -30,24 +30,23 @@ export class ShareManager
         {
             if (!gid) throw new Error();
 
-            return this.directoryIsSetup(path, gid).then(directoryIsSetup =>
+            return this.directoryIsSetup(directory, gid).then(directoryIsSetup =>
             {
-                if (directoryIsSetup) return true;
-                return this.setupDirectory(path, gid);
-            }).then((res) =>
+                return directoryIsSetup || this.setupDirectory(directory, gid);
+            }).then((directorySetup) =>
             {
-                if (!res) throw new Error('Could not setup directory ' + path);
+                if (!directorySetup) throw new Error('Could not setup directory ' + directory);
             });
         }).then(() =>
         {
-            const splitPath = path.split('/');
-            const basePath = splitPath.slice(0, splitPath.length - 1).join('/');
-            return this.systemHelper.isSMBShareSetup(username, basePath).then((isSetup: boolean) =>
+            return this.systemHelper.isSMBShareSetup(username, directory).then((isSetup: boolean) =>
             {
-                if (!isSetup) return this.systemHelper.createSMBShare(username, basePath);
-                else return true;
+                if (!isSetup) return this.systemHelper.createSMBShare(username, directory);
             });
-        }).catch(() =>
+        }).then(() =>
+        {
+            return true;
+        }).catch((err: Error) =>
         {
             return false;
         });

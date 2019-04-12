@@ -121,11 +121,11 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 	// File writing request handling
 	if (request.method === 'POST' && request.url === '/setupShare')
 	{
-		if (!request.body.fileName) throw new Error('setupShare requires fileName');
+		if (!request.body.directory) throw new Error('setupShare requires directory');
 		if (!request.body.username) throw new Error('setupShare requires username');
 		if (!request.body.password) throw new Error('setupShare requires password');
 
-		return shareManager.setupShare(request.body.fileName, request.body.username, request.body.password).then((result: boolean) =>
+		return shareManager.setupShare(request.body.directory, request.body.username, request.body.password).then((result: boolean) =>
 		{
 			if (result) return 'OK';
 			else throw new Error('Could not setup share');
