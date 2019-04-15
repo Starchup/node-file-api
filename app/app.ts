@@ -72,28 +72,35 @@ const writers: WriterList = {};
  */
 const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 {
-	// Handle Status method
+	// Handle healthcheck/status method
 	if (request.method === 'GET' && request.url === '/')
 	{
+		// TODO - Do something uesful like check the mysql connection or file IO is up and running
 		return Promise.resolve('OK');
 	}
 
 	// File watching request handling
+	// - when asked, the service will start monitoring for changes in the given file
 	if (request.method === 'POST' && request.url === '/watchFile')
 	{
 		if (!request.body.fileName) throw new Error('watchFile requires fileName');
 
 		if (!readers[request.body.fileName])
 		{
-			readers[request.body.fileName] = new FileWatcher(filePath(request.body.fileName), (data: string) =>
-			{
-				emitter.send(process.env.NODE_ENV, request.body.fileName, data);
-			});
+			readers[request.body.fileName] = new FileWatcher(
+				filePath(request.body.fileName),
+				(data: string) =>
+				{
+					// When file reader polling sees a new line in the file, it reads it
+					// and returns it here everytime so we can send it to pubsub for other services to consume
+					emitter.send(process.env.NODE_ENV, request.body.fileName, data);
+				});
 		}
 		return Promise.resolve('OK');
 	}
 
 	// File writing request handling
+	// - when asked, the service will write a line of text to the given file
 	if (request.method === 'POST' && request.url === '/writeFile')
 	{
 		if (!request.body.fileName) throw new Error('watchFile requires fileName');
@@ -107,33 +114,37 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 			writers[request.body.fileName] = writer;
 		}
 
-		return writer.writeData(request.body.data).then((result: boolean) =>
-		{
-			if (result) return 'OK';
-			else throw new Error('Could not write to file');
-		}).catch(err =>
-		{
-			console.error('Server /writeFile Error: ' + err.message);
-			throw err;
-		});
+		return writer.writeData(request.body.data)
+			.then((result: boolean) =>
+			{
+				if (result) return 'OK';
+				else throw new Error('Could not write to file');
+			}).catch(err =>
+			{
+				console.error('Server /writeFile Error: ' + err.message);
+				throw err;
+			});
 	}
 
 	// File writing request handling
+	// - when asked, the service will setup a shared SAMBA directory and file system
+	//   for the specified username & password
 	if (request.method === 'POST' && request.url === '/setupShare')
 	{
 		if (!request.body.directory) throw new Error('setupShare requires directory');
 		if (!request.body.username) throw new Error('setupShare requires username');
 		if (!request.body.password) throw new Error('setupShare requires password');
 
-		return shareManager.setupShare(request.body.directory, request.body.username, request.body.password).then((result: boolean) =>
-		{
-			if (result) return 'OK';
-			else throw new Error('Could not setup share');
-		}).catch(err =>
-		{
-			console.error('Server /setupShare Error: ' + err.message);
-			throw err;
-		});
+		return shareManager.setupShare(request.body.directory, request.body.username, request.body.password)
+			.then((result: boolean) =>
+			{
+				if (result) return 'OK';
+				else throw new Error('Could not setup share');
+			}).catch(err =>
+			{
+				console.error('Server /setupShare Error: ' + err.message);
+				throw err;
+			});
 	}
 
 	throw new Error('Method or URL invalid');
