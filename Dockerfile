@@ -3,7 +3,7 @@ FROM mhart/alpine-node:6.5
 MAINTAINER Matt Jones <matt@starchup.com>
 
 # Install samba
-RUN echo http://nl.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories
+RUN echo http://nl.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories
 RUN apk --no-cache --no-progress upgrade && \
     apk --no-cache --no-progress add s6 s6-portable-utils bash shadow samba && \
     rm -rf /var/cache/apk/*
