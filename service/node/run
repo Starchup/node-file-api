@@ -1,3 +1,3 @@
 #!/bin/sh
 
-exec /usr/bin/node ~/build/app.js
+exec /usr/bin/node /build/app.js
