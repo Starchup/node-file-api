@@ -1,8 +1,0 @@
-#!/bin/sh
-
-# Aggregate the stderr output of all the other services, and send it to the stderr
-# we inherited from init (i.e. it goes to the container's stderr). Note that cwd
-# will be the svscandir, since we inherit that from s6-supervise.
-echo "CWD: $PWD"
-exec ls -1 .. | grep -v 'stdout-logger' | grep -v 'stderr-logger' \
-	| sed -e 's|^\(.*\)$|../\1/stderr|' | xargs /usr/bin/aggregator >&2

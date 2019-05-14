@@ -1,8 +1,0 @@
-#!/bin/sh
-
-# Aggregate the stdout output of all the other services, and send it to the stdout
-# we inherited from init (i.e. it goes to the container's stdout). Note that cwd
-# is this service directory, and therefore the parent is the svscandir.
-echo "CWD: $PWD"
-exec ls -1 .. | grep -v 'stdout-logger' | grep -v 'stderr-logger' \
-	| sed -e 's|^\(.*\)$|../\1/stdout|' |  xargs /usr/bin/aggregator
