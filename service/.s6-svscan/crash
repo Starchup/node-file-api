@@ -1,0 +1,15 @@
+#!/bin/sh
+
+echo "Uh-oh, s6 supervisor is bailing out. System is going down hard." >&2
+
+# Make sure everything else is dead.
+kill -KILL -1
+
+# Make sure any dirty data has been synchronized.
+sync
+
+# This is a container, so halt/reboot just mean exiting the init process.
+# Technically, we could call reboot(2) and assume we'll be terminated,
+# since PID namespaces support this, but it requires CAP_SYS_BOOT and not
+# all hosting environments supply that.
+exit 1
