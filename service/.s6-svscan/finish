@@ -1,0 +1,27 @@
+#!/bin/sh
+
+echo "System is shutting down ($1)"
+
+# Note: .s6-svscan/SIGTERM has already asked all the services to be terminated. Send SIGTERM to any
+# stray processes that have escaped the supervision tree.
+echo "Sending SIGTERM to all processes"
+kill -TERM -1
+
+# Wait for the services to be down, rather than a blind sleep. This will be faster if shutdowns are prompt.
+# Non-supervised processes may get the short end of the stick with this, but there shouldn't be any
+# of those anyway.
+echo "Waiting for processes to terminate"
+s6-svwait -D -t 3000 ./*
+
+# Ok boyos, party's over. Supervisors shouldn't restart anything, since we've asked it to
+# down everything previously.
+echo "Sending SIGKILL to all processes"
+kill -KILL -1
+
+# Make sure we've written any pending data to disk.
+echo "Syncing disks"
+sync
+
+# This is a container, so don't bother trying to call reboot(2);
+# we may not have CAP_SYS_BOOT and it would just cause trouble.
+exit 0
