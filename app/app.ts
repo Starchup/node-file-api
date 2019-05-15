@@ -81,7 +81,7 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 
 	// File watching request handling
 	// - when asked, the service will start monitoring for changes in the given file
-	if (request.method === 'POST' && request.url === '/api/watchFile')
+	if (request.method === 'POST' && request.url === '/watchFile')
 	{
 		if (!request.body.fileName) throw new Error('watchFile requires fileName');
 
@@ -101,7 +101,7 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 
 	// File writing request handling
 	// - when asked, the service will write a line of text to the given file
-	if (request.method === 'POST' && request.url === '/api/writeFile')
+	if (request.method === 'POST' && request.url === '/writeFile')
 	{
 		if (!request.body.fileName) throw new Error('watchFile requires fileName');
 		if (!request.body.data) throw new Error('watchFile requires data');
@@ -129,7 +129,7 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 	// File writing request handling
 	// - when asked, the service will setup a shared SAMBA directory and file system
 	//   for the specified username & password
-	if (request.method === 'POST' && request.url === '/api/setupShare')
+	if (request.method === 'POST' && request.url === '/setupShare')
 	{
 		if (!request.body.directory) throw new Error('setupShare requires directory');
 		if (!request.body.username) throw new Error('setupShare requires username');
