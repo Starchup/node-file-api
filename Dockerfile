@@ -1,4 +1,4 @@
-FROM mhart/alpine-node:6.5
+FROM mhart/alpine-node:8
 
 MAINTAINER Matt Jones <matt@starchup.com>
 
