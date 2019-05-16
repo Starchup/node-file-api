@@ -63,8 +63,7 @@ function adduser(username: string): Promise < void >
 {
     return new Promise((resolve: PromiseCallback, reject: PromiseErrCallback) =>
     {
-        const child = spawn('adduser', ['--disabled-password', '--gecos', '""', username]);
-
+        const child = spawn('adduser', ['-D', '-g', '""', username]);
         child.stderr.on('data', (error) =>
         {
             reject(Error(error.toString()));
@@ -83,14 +82,12 @@ function passwd(username: string, password: string): Promise < void >
     return new Promise((resolve: PromiseCallback, reject: PromiseErrCallback) =>
     {
         const child = spawn('passwd', [username]);
-
         child.stderr.on('data', (data) =>
         {
-            if (data.toString().indexOf('Enter new UNIX password:') > -1)
-            {
-                child.stdin.write(password + '\n');
-            }
-            else if (data.toString().indexOf('Retype new UNIX password:') > -1)
+            if (data.toString().indexOf('New password:') > -1 ||
+                data.toString().indexOf('Retype new password:') > -1 ||
+                data.toString().indexOf('Enter new UNIX password:') > -1 ||
+                data.toString().indexOf('Retype new UNIX password:') > -1)
             {
                 child.stdin.write(password + '\n');
             }
