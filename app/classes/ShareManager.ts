@@ -94,9 +94,10 @@ export class ShareManager
             return prev.then(() =>
             {
                 //If the path has a . at the beginning, or if the path has a file extension, exit
-                if (curr.indexOf('.') > -1) return Promise.resolve();
-
+                if (curr.indexOf('.') > -1) return;
                 const currPath = directories.slice(0, idx + 1).join('/');
+                if (!currPath || currPath.length < 1) return;
+
                 return this.makeDir(currPath, gid).then((res: boolean) =>
                 {
                     if (res) return this.chownDir(currPath, gid);
