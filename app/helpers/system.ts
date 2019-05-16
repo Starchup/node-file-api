@@ -29,19 +29,16 @@ export function createSMBShare(groupname: string, path: string): Promise < void 
 {
     return appendToFile(_sambaConf, '[' + groupname + ']').then(res =>
     {
-        return appendToFile(_sambaConf, 'path = ' + path)
+        return appendToFile(_sambaConf, 'path = ' + path);
     }).then(res =>
     {
-        return appendToFile(_sambaConf, 'valid users = ' + groupname)
+        return appendToFile(_sambaConf, 'valid users = ' + groupname);
     }).then(res =>
     {
-        return appendToFile(_sambaConf, 'read only = no')
+        return appendToFile(_sambaConf, 'read only = no');
     }).then(res =>
     {
-        return appendToFile(_sambaConf, '\n')
-    }).then(res =>
-    {
-        return runNoIOCommand('service', ['smbd', 'restart']);
+        return appendToFile(_sambaConf, '\n');
     });
 }
 
