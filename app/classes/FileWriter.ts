@@ -55,8 +55,9 @@ export class FileWriter
     {
         if (data.indexOf('\n') < 0) data = '\n' + data;
 
-        return this.fsp.appendFile(this._fileName, data).then(() =>
+        return this.fsp.appendFile(this._fileName, data).then((err: Error) =>
         {
+            if (err) throw new Error(err.toString());
             return true;
         }).catch((err: Error) =>
         {
