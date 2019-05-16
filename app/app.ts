@@ -135,7 +135,8 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 		if (!request.body.username) throw new Error('setupShare requires username');
 		if (!request.body.password) throw new Error('setupShare requires password');
 
-		return shareManager.setupShare(request.body.directory, request.body.username, request.body.password)
+		const path = filePath(request.body.directory);
+		return shareManager.setupShare(path, request.body.username, request.body.password)
 			.then((result: boolean) =>
 			{
 				if (result) return 'OK';
@@ -153,4 +154,3 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 const filePath = function (fileName: string): string
 {
 	return process.env.FILE_API_DIRECTORY + '/' + fileName;
-}
