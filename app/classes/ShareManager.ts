@@ -15,7 +15,7 @@ export class ShareManager
     private fsp = this.fs.promises;
 
     private uid = this.os.userInfo().uid;
-    private permissions = '760';
+    private permissions = '770';
 
     private systemHelper = require('../helpers/system');
 
