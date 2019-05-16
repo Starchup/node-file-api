@@ -69,6 +69,11 @@ function adduser(username: string): Promise < void >
             reject(Error(error.toString()));
         });
 
+        child.stderr.on('error', (error) =>
+        {
+            reject(Error(error.toString()));
+        });
+
         child.on('exit', code =>
         {
             if (code === 0) resolve();
@@ -97,6 +102,11 @@ function passwd(username: string, password: string): Promise < void >
             }
         });
 
+        child.stderr.on('error', (error) =>
+        {
+            reject(Error(error.toString()));
+        });
+
         child.on('exit', code =>
         {
             if (code === 0) resolve();
@@ -110,7 +120,6 @@ function smbpasswd(username: string, password: string): Promise < void >
     return new Promise((resolve: PromiseCallback, reject: PromiseErrCallback) =>
     {
         const child = spawn('smbpasswd', ['-a', username]);
-
         child.stdout.on('data', (data) =>
         {
             if (data.toString().indexOf('New SMB password:') > -1)
@@ -128,6 +137,11 @@ function smbpasswd(username: string, password: string): Promise < void >
             reject(Error(error.toString()));
         });
 
+        child.stderr.on('error', (error) =>
+        {
+            reject(Error(error.toString()));
+        });
+
         child.on('exit', code =>
         {
             if (code === 0) resolve();
@@ -141,8 +155,12 @@ function runNoIOCommand(command: string, args: Array < string > ): Promise < voi
     return new Promise((resolve: PromiseCallback, reject: PromiseErrCallback) =>
     {
         const child = spawn(command, args);
-
         child.stderr.on('data', (error) =>
+        {
+            reject(Error(error.toString()));
+        });
+
+        child.stderr.on('error', (error) =>
         {
             reject(Error(error.toString()));
         });

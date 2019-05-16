@@ -48,6 +48,7 @@ export class ShareManager
             return true;
         }).catch((err: Error) =>
         {
+            console.error('setupShare error: ' + JSON.stringify(err));
             return false;
         });
     }
@@ -166,9 +167,6 @@ export class ShareManager
 
             return parseInt(groupId);
 
-        }).catch((err: Error) =>
-        {
-            console.error('ShareManager getGroupId got error: ' + err.toString());
         });
     }
 
