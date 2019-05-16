@@ -16,6 +16,7 @@ export class ShareManager
 
     private uid = this.os.userInfo().uid;
     private permissions = '770';
+    private inheritGroupPermissions = 'g+s';
 
     private systemHelper = require('../helpers/system');
 
@@ -129,6 +130,9 @@ export class ShareManager
     private chownDir(path: string, gid: number): Promise < boolean >
     {
         return this.fsp.chown(path, this.uid, gid).then(() =>
+        {
+            return this.systemHelper.setDirectoryPermissions(path, this.inheritGroupPermissions);
+        }).then(() =>
         {
             return true;
         }).catch((err: Error) =>

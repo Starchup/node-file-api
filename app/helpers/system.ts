@@ -58,6 +58,11 @@ export function isSMBShareSetup(groupname: string, path: string): Promise < bool
     });
 }
 
+export function setDirectoryPermissions(path: string, permissions: string): Promise < void >
+{
+    return runNoIOCommand('chmod', [permissions, path]);
+}
+
 
 function adduser(username: string): Promise < void >
 {
