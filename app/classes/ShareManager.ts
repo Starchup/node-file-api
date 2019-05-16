@@ -15,7 +15,8 @@ export class ShareManager
     private fsp = this.fs.promises;
 
     private uid = this.os.userInfo().uid;
-    private permissions = '760';
+    private permissions = '770';
+    private inheritGroupPermissions = 'g+s';
 
     private systemHelper = require('../helpers/system');
 
@@ -48,6 +49,7 @@ export class ShareManager
             return true;
         }).catch((err: Error) =>
         {
+            console.error('setupShare error: ' + JSON.stringify(err));
             return false;
         });
     }
@@ -129,6 +131,9 @@ export class ShareManager
     {
         return this.fsp.chown(path, this.uid, gid).then(() =>
         {
+            return this.systemHelper.setDirectoryPermissions(path, this.inheritGroupPermissions);
+        }).then(() =>
+        {
             return true;
         }).catch((err: Error) =>
         {
@@ -166,9 +171,6 @@ export class ShareManager
 
             return parseInt(groupId);
 
-        }).catch((err: Error) =>
-        {
-            console.error('ShareManager getGroupId got error: ' + err.toString());
         });
     }
 

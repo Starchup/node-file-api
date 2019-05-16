@@ -83,17 +83,17 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 	// - when asked, the service will start monitoring for changes in the given file
 	if (request.method === 'POST' && request.url === '/watchFile')
 	{
-		if (!request.body.fileName) throw new Error('watchFile requires fileName');
+		if (!request.body.directory) throw new Error('watchFile requires directory');
 
-		if (!readers[request.body.fileName])
+		if (!readers[request.body.directory])
 		{
-			readers[request.body.fileName] = new FileWatcher(
-				filePath(request.body.fileName),
+			readers[request.body.directory] = new FileWatcher(
+				filePath(request.body.directory),
 				(data: string) =>
 				{
 					// When file reader polling sees a new line in the file, it reads it
 					// and returns it here everytime so we can send it to pubsub for other services to consume
-					emitter.send(process.env.NODE_ENV, request.body.fileName, data);
+					emitter.send(process.env.NODE_ENV, request.body.directory, data);
 				});
 		}
 		return Promise.resolve('OK');
@@ -103,15 +103,15 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 	// - when asked, the service will write a line of text to the given file
 	if (request.method === 'POST' && request.url === '/writeFile')
 	{
-		if (!request.body.fileName) throw new Error('watchFile requires fileName');
+		if (!request.body.directory) throw new Error('watchFile requires directory');
 		if (!request.body.data) throw new Error('watchFile requires data');
 
-		let writer: FileWriter = writers[request.body.fileName];
+		let writer: FileWriter = writers[request.body.directory];
 		if (!writer)
 		{
-			const path = filePath(request.body.fileName);
+			const path = filePath(request.body.directory) + '/' + request.body.directory + '.txt';
 			writer = new FileWriter(path);
-			writers[request.body.fileName] = writer;
+			writers[request.body.directory] = writer;
 		}
 
 		return writer.writeData(request.body.data)
@@ -135,7 +135,8 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 		if (!request.body.username) throw new Error('setupShare requires username');
 		if (!request.body.password) throw new Error('setupShare requires password');
 
-		return shareManager.setupShare(request.body.directory, request.body.username, request.body.password)
+		const path = filePath(request.body.directory);
+		return shareManager.setupShare(path, request.body.username, request.body.password)
 			.then((result: boolean) =>
 			{
 				if (result) return 'OK';
