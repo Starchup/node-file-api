@@ -116,7 +116,7 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 		if (!request.body.username) throw new Error('setupShare requires username');
 		if (!request.body.password) throw new Error('setupShare requires password');
 
-		const path = filePath(request.body.directory);
+		const path: string = filePath(request.body.directory);
 		return shareManager.setupShare(path, request.body.username, request.body.password)
 			.then((result: boolean) =>
 			{
