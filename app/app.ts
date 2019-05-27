@@ -84,13 +84,13 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 	if (request.method === 'POST' && request.url.indexOf('/writeFile') > -1)
 	{
 		if (!request.body.directory) throw new Error('watchFile requires directory');
+		if (!request.body.filename) throw new Error('watchFile requires filename');
 		if (!request.body.data) throw new Error('watchFile requires data');
 
 		let writer: FileWriter = writers[request.body.directory];
 		if (!writer)
 		{
-			const path = filePath(request.body.directory) + '/' + request.body.directory + '.txt';
-			writer = new FileWriter(path);
+			writer = new FileWriter(filePath(request.body.directory) + '/' + request.body.filename);
 			writers[request.body.directory] = writer;
 		}
 
@@ -112,6 +112,7 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 	if (request.method === 'POST' && request.url.indexOf('/setupShare') > -1)
 	{
 		if (!request.body.directory) throw new Error('setupShare requires directory');
+		if (!request.body.filename) throw new Error('setupShare requires filename');
 		if (!request.body.username) throw new Error('setupShare requires username');
 		if (!request.body.password) throw new Error('setupShare requires password');
 
@@ -124,7 +125,7 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 				if (!readers[request.body.directory])
 				{
 					readers[request.body.directory] = new FileWatcher(
-						filePath(request.body.directory),
+						filePath(request.body.directory) + '/' + request.body.filename,
 						(data: string) =>
 						{
 							// When file reader polling sees a new line in the file, it reads it
