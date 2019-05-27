@@ -79,26 +79,6 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 		return Promise.resolve('OK');
 	}
 
-	// File watching request handling
-	// - when asked, the service will start monitoring for changes in the given file
-	if (request.method === 'POST' && request.url.indexOf('/watchFile') > -1)
-	{
-		if (!request.body.directory) throw new Error('watchFile requires directory');
-
-		if (!readers[request.body.directory])
-		{
-			readers[request.body.directory] = new FileWatcher(
-				filePath(request.body.directory),
-				(data: string) =>
-				{
-					// When file reader polling sees a new line in the file, it reads it
-					// and returns it here everytime so we can send it to pubsub for other services to consume
-					emitter.send(process.env.NODE_ENV, request.body.directory, data);
-				});
-		}
-		return Promise.resolve('OK');
-	}
-
 	// File writing request handling
 	// - when asked, the service will write a line of text to the given file
 	if (request.method === 'POST' && request.url.indexOf('/writeFile') > -1)
@@ -139,8 +119,21 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 		return shareManager.setupShare(path, request.body.username, request.body.password)
 			.then((result: boolean) =>
 			{
-				if (result) return 'OK';
-				else throw new Error('Could not setup share');
+				if (!result) throw new Error('Could not setup share');
+
+				if (!readers[request.body.directory])
+				{
+					readers[request.body.directory] = new FileWatcher(
+						filePath(request.body.directory),
+						(data: string) =>
+						{
+							// When file reader polling sees a new line in the file, it reads it
+							// and returns it here everytime so we can send it to pubsub for other services to consume
+							emitter.send(process.env.NODE_ENV, request.body.directory, data);
+						});
+				}
+
+				return 'OK';
 			}).catch(err =>
 			{
 				console.error('Server /setupShare Error: ' + err.message);
