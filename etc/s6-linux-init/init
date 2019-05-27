@@ -1,0 +1,46 @@
+#!/bin/execlineb -P
+
+# These are execline-compatible /programs/ supplied by s6, not the
+# usual shell builtins.
+/bin/export PATH "/usr/bin:/usr/sbin:/bin:/sbin"
+/bin/cd /
+s6-setsid -qb --
+umask 022
+if { s6-echo -- "\n  init created by s6-linux-init-maker\n  see http://skarnet.org/software/s6-linux-init/\n\n" }
+
+# Skarnet's recommendation is to use a read-only service dir and
+# copy it to the scan directory on startup, so the service dir isn't
+# polluted by runtime files from the supervisor that might prevent
+# the system from coming up on reboot. However, in a static container
+# environment that's not an issue, and it would prevent us from
+# reconfiguring the service directories and HUPing the supervisor
+# without first re-copying the image. Services will be run directly
+# out of /service.
+#if { s6-mount -nwt tmpfs -o mode=0755 tmpfs "/run" }
+#if { s6-hiercopy "/etc/s6-linux-init"/run-image "/run" }
+
+# This is a container, we want to keep the environment we inherited.
+#emptyenv -p
+#s6-envdir -I -- "/etc/s6-linux-init"/env
+
+# We also don't want a logger, since we expect everything to go to
+# the console (to which an outer logger is probably attached).
+#redirfd -wnb 1 "/run"/service/s6-svscan-log/fifo
+
+# It's still not legitimate to read from the console, though.
+redirfd -r 0 /dev/null
+
+# We want to run init tasks in the foreground, rather than concurrently
+# with service startup.
+foreground {
+  s6-setsid --
+  #redirfd -w 1 "/run"/service/s6-svscan-log/fifo
+  #fdmove -c 1 2
+  "/etc/rc.init"
+}
+unexport !
+cd /service
+# We want to preserve the separate stdout and stderr for the GCP logger.
+# This isn't really compatible with s6's internal logging scheme, though.
+# fdmove -c 2 1
+s6-svscan -st0
