@@ -1,3 +1,13 @@
+interface FSStatObject
+{
+    [gid: string]: number;
+}
+
+interface FSError
+{
+    [code: string]: string;
+}
+
 export class ShareManager
 {
     private os = require('os');
@@ -5,14 +15,13 @@ export class ShareManager
     private fsp = this.fs.promises;
 
     private uid = this.os.userInfo().uid;
-    private permissions = '760';
+    private permissions = '770';
+    private inheritGroupPermissions = 'g+s';
 
     private systemHelper = require('../helpers/system');
 
-    constructor()
-
     /* Public methods */
-    public setupShare(path: string, username: string, password: string): Promise < boolean >
+    public setupShare(directory: string, username: string, password: string): Promise < boolean >
     {
         return this.getGroupId(username).then(gid =>
         {
@@ -22,15 +31,25 @@ export class ShareManager
         {
             if (!gid) throw new Error();
 
-            return this.directoryIsSetup(path, gid).then(directoryIsSetup =>
+            return this.directoryIsSetup(directory, gid).then(directoryIsSetup =>
             {
-                if (!directoryIsSetup) return this.setupDirectory(path, gid);
+                return directoryIsSetup || this.setupDirectory(directory, gid);
+            }).then((directorySetup) =>
+            {
+                if (!directorySetup) throw new Error('Could not setup directory ' + directory);
             });
-        }).then((res) =>
+        }).then(() =>
         {
-            return !!res;
-        }).catch(() =>
+            return this.systemHelper.isSMBShareSetup(username, directory).then((isSetup: boolean) =>
+            {
+                if (!isSetup) return this.systemHelper.createSMBShare(username, directory);
+            });
+        }).then(() =>
         {
+            return true;
+        }).catch((err: Error) =>
+        {
+            console.error('setupShare error: ' + JSON.stringify(err));
             return false;
         });
     }
@@ -40,12 +59,16 @@ export class ShareManager
      */
     private directoryIsSetup(path: string, gid: number): Promise < boolean >
     {
-        return this.directoryIsWritable(path).then((isWritable) =>
+        return this.directoryIsWritable(path).then((isWritable: boolean) =>
         {
             if (isWritable) return this.directoryHasOwnerAndGroup(path, gid);
-        }).then(res =>
+            else return false;
+        }).then((res: boolean) =>
         {
             return !!res;
+        }).catch(() =>
+        {
+            return false;
         });
     }
 
@@ -72,12 +95,15 @@ export class ShareManager
             {
                 //If the path has a . at the beginning, or if the path has a file extension, exit
                 if (curr.indexOf('.') > -1) return;
-
                 const currPath = directories.slice(0, idx + 1).join('/');
-                return this.makeDir(currPath, gid).then(res =>
+                if (!currPath || currPath.length < 1) return;
+
+                return this.makeDir(currPath, gid).then((res: boolean) =>
                 {
                     if (res) return this.chownDir(currPath, gid);
-                });
+                    else return false;
+                }).then(() =>
+                {});
             });
         }, Promise.resolve()).then(() =>
         {
@@ -93,7 +119,7 @@ export class ShareManager
         return this.fsp.mkdir(path, this.permissions).then(() =>
         {
             return true;
-        }).catch((err) =>
+        }).catch((err: FSError) =>
         {
             if (err.code === 'EEXIST') return true;
 
@@ -106,8 +132,11 @@ export class ShareManager
     {
         return this.fsp.chown(path, this.uid, gid).then(() =>
         {
+            return this.systemHelper.setDirectoryPermissions(path, this.inheritGroupPermissions);
+        }).then(() =>
+        {
             return true;
-        }).catch((err) =>
+        }).catch((err: Error) =>
         {
             console.error('ShareManager chownDir got error: ' + err.toString());
             return false;
@@ -116,7 +145,7 @@ export class ShareManager
 
     private directoryHasOwnerAndGroup(path: string, gid: number): Promise < boolean >
     {
-        return this.fsp.stat(path, this.fs.W_OK).then((stat) =>
+        return this.fsp.stat(path, this.fs.W_OK).then((stat: FSStatObject) =>
         {
             return stat.gid === gid;
         }).catch(() =>
@@ -143,10 +172,6 @@ export class ShareManager
 
             return parseInt(groupId);
 
-        }).catch((err: Error) =>
-        {
-            console.error('ShareManager getGroupId got error: ' + err.toString());
-            return;
         });
     }
 
@@ -154,7 +179,7 @@ export class ShareManager
     {
         return this.systemHelper.createGroup(groupname, password).then(() =>
         {
-            return getGroupId(groupname);
+            return this.getGroupId(groupname);
         });
     }
 }
