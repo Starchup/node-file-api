@@ -28,7 +28,7 @@ export class FileWatcher
             {
                 console.error('FileWatcher ' + fileName + ' got error: ' + err.toString());
             });
-        }, 1000);
+        }, 100);
     }
 
     /* Private helpers */
