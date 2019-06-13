@@ -67,6 +67,8 @@ const shareManager: ShareManager = new ShareManager();
 const readers: ReaderList = {};
 const writers: WriterList = {};
 
+const refreshRate = 100; // 10th of a second
+
 /**
  * Main server implementation
  */
@@ -125,7 +127,9 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 				if (!readers[request.body.directory])
 				{
 					readers[request.body.directory] = new FileWatcher(
-						filePath(request.body.directory) + '/' + request.body.filename,
+						filePath(request.body.directory),
+						request.body.filename,
+						refreshRate,
 						(data: string) =>
 						{
 							// When file reader polling sees a new line in the file, it reads it
