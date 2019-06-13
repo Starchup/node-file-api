@@ -4,7 +4,7 @@ export class PubSubEmitter
     private _client: any;
     private _env: string;
 
-    constructor(public pubsub_id: string, environment: string)
+    constructor(pubsub_id: string, environment: string)
     {
         this._env = environment;
         this._client = this.Pubsub.init(pubsub_id);

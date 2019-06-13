@@ -8,7 +8,7 @@ export class FileWriter
 
     private _fileName: string;
 
-    constructor(public fileName: string)
+    constructor(fileName: string)
     {
         this._fileName = fileName;
 

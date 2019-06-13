@@ -10,7 +10,7 @@ export class FileWatcher
 
     private _fileName: string;
 
-    constructor(public fileName: string, public delegate: FileWatcherDelegate)
+    constructor(fileName: string, delegate: FileWatcherDelegate)
     {
         this._fileName = fileName;
 
