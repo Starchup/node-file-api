@@ -61,7 +61,7 @@ export class FileWriter
             return true;
         }).catch((err: Error) =>
         {
-            console.error('FileWriter ' + this.fileName + ' got appendFile error: ' + err.toString());
+            console.error('FileWriter ' + this._fileName + ' got appendFile error: ' + err.toString());
             return false;
         });
     }
