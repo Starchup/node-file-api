@@ -10,7 +10,7 @@ type PromiseErrCallback = (arg: Error) => void;
 
 export class Server
 {
-	constructor(public port: number, public delegate: ServerDelegate)
+	constructor(port: number, delegate: ServerDelegate)
 	{
 		http.createServer((request: http.IncomingMessage, response: http.ServerResponse) =>
 		{

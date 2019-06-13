@@ -5,38 +5,68 @@ export interface FileWatcherDelegate
 
 export class FileWatcher
 {
+    private moment = require('moment');
     private fs = require('fs');
     private fsp = this.fs.promises;
 
-    private _fileName: string;
-
-    constructor(public fileName: string, public delegate: FileWatcherDelegate)
+    constructor(directory: string, fileName: string, refreshRate: number, delegate: FileWatcherDelegate)
     {
-        this._fileName = fileName;
+        let fileIncludesFormat: boolean = false;
+        if (fileName.indexOf('YYYYMMDDHHMMSSss') > -1) fileIncludesFormat = true;
 
-        setInterval(() =>
+        if (!fileIncludesFormat)
         {
-            if (!this.fileReadableSync()) return;
+            setInterval(() =>
+            {
+                this.checkReadDeleteCycle(directory + '/' + fileName, delegate);
+            }, refreshRate);
+        }
+        else
+        {
+            const formatWithoutEscapeChars: string = fileName.replace(/\[|\]/g, '');
 
-            this.readFile().then((data: string) =>
+            setInterval(() =>
             {
-                return this.deleteFile().then(() =>
+                const inFiles: Array < string > = this.listFilesSync(directory).filter((f: string) =>
                 {
-                    return delegate(data.toString());
+                    return f.length === formatWithoutEscapeChars.length && this.moment(f, fileName).isValid();
                 });
-            }).catch((err: Error) =>
-            {
-                console.error('FileWatcher ' + fileName + ' got error: ' + err.toString());
-            });
-        }, 100);
+                if (inFiles.length < 1) return;
+
+                let earliestFile: string = inFiles[0];
+                if (inFiles.length > 1) inFiles.forEach((f: string, idx: number) =>
+                {
+                    const fDate = this.moment(f, fileName);
+                    const earliestDate = this.moment(earliestFile, fileName);
+                    if (fDate.isBefore(earliestDate)) earliestFile = f;
+                });
+                this.checkReadDeleteCycle(directory + '/' + earliestFile, delegate);
+            }, refreshRate);
+        }
     }
 
     /* Private helpers */
-    private fileReadableSync(): boolean
+    private checkReadDeleteCycle(filePath: string, delegate: FileWatcherDelegate): void
+    {
+        if (!this.fileReadableSync(filePath)) return;
+
+        this.readFile(filePath).then((data: string) =>
+        {
+            return this.deleteFile(filePath).then(() =>
+            {
+                return delegate(data.toString());
+            });
+        }).catch((err: Error) =>
+        {
+            console.error('FileWatcher ' + filePath + ' got error: ' + err.toString());
+        });
+    }
+
+    private fileReadableSync(fileName: string): boolean
     {
         try
         {
-            this.fs.accessSync(this._fileName, this.fs.R_OK);
+            this.fs.accessSync(fileName, this.fs.R_OK);
         }
         catch (e)
         {
@@ -45,13 +75,18 @@ export class FileWatcher
         return true;
     }
 
-    private readFile()
+    private listFilesSync(directoryName: string)
     {
-        return this.fsp.readFile(this._fileName);
+        return this.fs.readdirSync(directoryName)
     }
 
-    private deleteFile()
+    private readFile(fileName: string)
     {
-        return this.fsp.unlink(this._fileName);
+        return this.fsp.readFile(fileName);
+    }
+
+    private deleteFile(fileName: string)
+    {
+        return this.fsp.unlink(fileName);
     }
 }
