@@ -92,7 +92,7 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 		let writer: FileWriter = writers[request.body.directory];
 		if (!writer)
 		{
-			writer = new FileWriter(filePath(request.body.directory) + '/' + request.body.filename);
+			writer = new FileWriter(filePath(request.body.directory), request.body.filename);
 			writers[request.body.directory] = writer;
 		}
 
