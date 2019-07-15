@@ -39,6 +39,8 @@ export class FileWatcher
 
         this.readFile(filePath).then((data: string) =>
         {
+            console.debug('readFile from ' + filePath + ' success: ' + data);
+
             return this.deleteFile(filePath).then(() =>
             {
                 return delegate(data.toString());

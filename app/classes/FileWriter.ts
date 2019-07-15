@@ -63,6 +63,7 @@ export class FileWriter
         return this.fsp.appendFile(fullPath, data).then((err: Error) =>
         {
             if (err) throw new Error(err.toString());
+            console.debug('writeFile to ' + fullPath + ' success: ' + data);
             return true;
         }).catch((err: Error) =>
         {
