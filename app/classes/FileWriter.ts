@@ -5,11 +5,14 @@ export class FileWriter
 {
     private fs = require('fs');
     private fsp = this.fs.promises;
+    private moment = require('moment');
 
+    private _directoryName: string;
     private _fileName: string;
 
-    constructor(fileName: string)
+    constructor(directoryName: string, fileName: string)
     {
+        this._directoryName = directoryName;
         this._fileName = fileName;
 
         const fileWritable = this.fileWritableSync();
@@ -40,11 +43,10 @@ export class FileWriter
     {
         try
         {
-            this.fs.accessSync(this._fileName, this.fs.W_OK);
+            this.fs.accessSync(this._directoryName, this.fs.W_OK);
         }
         catch (e)
         {
-            if (e.code === 'ENOENT') return true;
             return false;
         }
         return true;
@@ -55,13 +57,16 @@ export class FileWriter
     {
         if (data.indexOf('\n') < 0) data = '\n' + data;
 
-        return this.fsp.appendFile(this._fileName, data).then((err: Error) =>
+        const timestampedFileName = this.moment().format(this._fileName)
+        const fullPath = this._directoryName + '/' + timestampedFileName;
+
+        return this.fsp.appendFile(fullPath, data).then((err: Error) =>
         {
             if (err) throw new Error(err.toString());
             return true;
         }).catch((err: Error) =>
         {
-            console.error('FileWriter ' + this._fileName + ' got appendFile error: ' + err.toString());
+            console.error('FileWriter ' + fullPath + ' got appendFile error: ' + err.toString());
             return false;
         });
     }

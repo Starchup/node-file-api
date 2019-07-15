@@ -11,38 +11,25 @@ export class FileWatcher
 
     constructor(directory: string, fileName: string, refreshRate: number, delegate: FileWatcherDelegate)
     {
-        let fileIncludesFormat: boolean = false;
-        if (fileName.indexOf('YYYYMMDDHHMMSSss') > -1) fileIncludesFormat = true;
-
-        if (!fileIncludesFormat)
-        {
-            setInterval(() =>
-            {
-                this.checkReadDeleteCycle(directory + '/' + fileName, delegate);
-            }, refreshRate);
-        }
-        else
+        setInterval(() =>
         {
             const formatWithoutEscapeChars: string = fileName.replace(/\[|\]/g, '');
 
-            setInterval(() =>
+            const inFiles: Array < string > = this.listFilesSync(directory).filter((f: string) =>
             {
-                const inFiles: Array < string > = this.listFilesSync(directory).filter((f: string) =>
-                {
-                    return f.length === formatWithoutEscapeChars.length && this.moment(f, fileName).isValid();
-                });
-                if (inFiles.length < 1) return;
+                return f.length === formatWithoutEscapeChars.length && this.moment(f, fileName).isValid();
+            });
+            if (inFiles.length < 1) return;
 
-                let earliestFile: string = inFiles[0];
-                if (inFiles.length > 1) inFiles.forEach((f: string, idx: number) =>
-                {
-                    const fDate = this.moment(f, fileName);
-                    const earliestDate = this.moment(earliestFile, fileName);
-                    if (fDate.isBefore(earliestDate)) earliestFile = f;
-                });
-                this.checkReadDeleteCycle(directory + '/' + earliestFile, delegate);
-            }, refreshRate);
-        }
+            let earliestFile: string = inFiles[0];
+            if (inFiles.length > 1) inFiles.forEach((f: string, idx: number) =>
+            {
+                const fDate = this.moment(f, fileName);
+                const earliestDate = this.moment(earliestFile, fileName);
+                if (fDate.isBefore(earliestDate)) earliestFile = f;
+            });
+            this.checkReadDeleteCycle(directory + '/' + earliestFile, delegate);
+        }, refreshRate);
     }
 
     /* Private helpers */
