@@ -10,26 +10,30 @@ export class FileWriter
     private _directoryName: string;
     private _fileName: string;
 
+    private _retryInterval: number = 500; // 500ms
+    private _tempFileName: string = 'tempfile.tmp';
+
     constructor(directoryName: string, fileName: string)
     {
         this._directoryName = directoryName;
         this._fileName = fileName;
 
-        const fileWritable = this.fileWritableSync();
-        if (!fileWritable) throw new Error('FileWriter file not writable ' + this._fileName);
+        const directoryWritable: boolean = this.directoryWritableSync();
+        if (!directoryWritable) throw new Error('FileWriter directory not writable ' + this._fileName);
     }
 
     /* Private methods */
     public writeData(data: string): Promise < boolean >
     {
-        if (this.fileWritableSync()) return this.writeFile(data);
+        if (this.directoryWritableSync()) return this.writeFile(data);
+        if (this.tempFileExistsSync()) return this.writeFile(data);
 
         return new Promise((resolve: PromiseCallback, reject: PromiseErrCallback) =>
         {
             setTimeout(() =>
             {
                 resolve();
-            }, 2000);
+            }, this._retryInterval);
         }).then(() =>
         {
             return this.writeData(data);
@@ -39,11 +43,23 @@ export class FileWriter
     /**
      * Private helpers
      */
-    private fileWritableSync(): boolean
+    private directoryWritableSync(): boolean
     {
         try
         {
             this.fs.accessSync(this._directoryName, this.fs.W_OK);
+        }
+        catch (e)
+        {
+            return false;
+        }
+        return true;
+    }
+    private tempFileExistsSync(): boolean
+    {
+        try
+        {
+            this.fs.accessSync(this._directoryName + '/' + this._tempFileName, this.fs.R_OK);
         }
         catch (e)
         {
@@ -59,10 +75,17 @@ export class FileWriter
 
         const timestampedFileName = this.moment().format(this._fileName)
         const fullPath = this._directoryName + '/' + timestampedFileName;
+        const fullTempPath = this._directoryName + '/' + this._tempFileName;
 
-        return this.fsp.appendFile(fullPath, data).then((err: Error) =>
+        return this.fsp.writeFile(fullTempPath, data).then((err: Error) =>
         {
             if (err) throw new Error(err.toString());
+
+            return this.fsp.rename(fullTempPath, fullPath);
+        }).then((err: Error) =>
+        {
+            if (err) throw new Error(err.toString());
+
             console.debug('writeFile to ' + fullPath + ' success: ' + data);
             return true;
         }).catch((err: Error) =>
