@@ -11,13 +11,16 @@ export class FileWatcher
 
     constructor(directory: string, fileName: string, refreshRate: number, delegate: FileWatcherDelegate)
     {
+        const formatWithoutEscapeChars: string = fileName.replace(/\[|\]/g, '');
+        const fileExtension: string = formatWithoutEscapeChars.substring(formatWithoutEscapeChars.indexOf('.'));
+
         setInterval(() =>
         {
-            const formatWithoutEscapeChars: string = fileName.replace(/\[|\]/g, '');
-
             const inFiles: Array < string > = this.listFilesSync(directory).filter((f: string) =>
             {
-                return f.length === formatWithoutEscapeChars.length && this.moment(f, fileName).isValid();
+                if (f.indexOf(fileExtension) < 0) return false;
+                if (f.length !== formatWithoutEscapeChars.length) return false;
+                return this.moment(f, fileName).isValid();
             });
             if (inFiles.length < 1) return;
 
