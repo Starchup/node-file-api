@@ -11,12 +11,12 @@ export class PubSubEmitter
     }
 
     /* Private methods */
-    public send(topic: string, data: object): void
+    public send(topic: string, data: string): void
     {
         const config = {
             env: this._env,
             topicName: topic
         };
-        this._client.emit(JSON.stringify(data), config);
+        this._client.emit(data, config);
     }
 }

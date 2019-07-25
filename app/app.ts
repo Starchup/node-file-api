@@ -130,15 +130,11 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 						filePath(request.body.directory),
 						request.body.filename,
 						refreshRate,
-						(data: string, serialNumber: string) =>
+						(data: string) =>
 						{
 							// When file reader polling sees a new line in the file, it reads it
 							// and returns it here everytime so we can send it to pubsub for other services to consume
-							emitter.send(request.body.directory,
-							{
-								data: data,
-								serialNumber: serialNumber
-							});
+							emitter.send(request.body.directory, data);
 						});
 				}
 
