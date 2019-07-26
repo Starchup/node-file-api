@@ -1,6 +1,6 @@
 export interface FileWatcherDelegate
 {
-    (message: string, serialNumber: string): void;
+    (message: string): void;
 }
 
 export class FileWatcher
@@ -12,28 +12,15 @@ export class FileWatcher
     constructor(directory: string, fileName: string, refreshRate: number, delegate: FileWatcherDelegate)
     {
         const formatWithoutEscapeChars: string = fileName.replace(/\[|\]/g, '');
-
-        const extensionIndex: number = formatWithoutEscapeChars.indexOf('.');
-        const fileExtension: string = formatWithoutEscapeChars.substring(extensionIndex);
-
-        const serialNumberSequence: number = formatWithoutEscapeChars.indexOf('_D:');
-
-        let serialNumberStart: number;
-        let serialNumberEnd: number;
-        if (serialNumberSequence > -1)
-        {
-            const serialNumberInfoStart: number = serialNumberSequence + 3;
-            const serialNumberInfoEnd: number = serialNumberSequence + 4;
-
-            serialNumberStart = serialNumberSequence + 1;
-            serialNumberEnd = serialNumberSequence + 1 + parseInt(formatWithoutEscapeChars.substring(serialNumberInfoStart, serialNumberInfoEnd));
-        }
+        const fileExtension: string = formatWithoutEscapeChars.substring(formatWithoutEscapeChars.indexOf('.'));
 
         setInterval(() =>
         {
             const inFiles: Array < string > = this.listFilesSync(directory).filter((f: string) =>
             {
-                return f.indexOf(fileExtension) > -1;
+                if (f.indexOf(fileExtension) < 0) return false;
+                if (f.length !== formatWithoutEscapeChars.length) return false;
+                return this.moment(f, fileName).isValid();
             });
             if (inFiles.length < 1) return;
 
@@ -41,32 +28,25 @@ export class FileWatcher
             if (inFiles.length > 1) inFiles.forEach((f: string, idx: number) =>
             {
                 const fDate = this.moment(f, fileName);
-                if (!this.moment(fDate, fileName).isValid()) return;
-
                 const earliestDate = this.moment(earliestFile, fileName);
                 if (fDate.isBefore(earliestDate)) earliestFile = f;
             });
-
-            let serialNumber: string = '';
-            if (serialNumberStart && serialNumberEnd)
-            {
-                serialNumber = earliestFile.substring(serialNumberStart, serialNumberEnd);
-            }
-
-            this.checkReadDeleteCycle(directory + '/' + earliestFile, delegate, serialNumber);
+            this.checkReadDeleteCycle(directory + '/' + earliestFile, delegate);
         }, refreshRate);
     }
 
     /* Private helpers */
-    private checkReadDeleteCycle(filePath: string, delegate: FileWatcherDelegate, serialNumber: string, ): void
+    private checkReadDeleteCycle(filePath: string, delegate: FileWatcherDelegate): void
     {
         if (!this.fileReadableSync(filePath)) return;
 
         this.readFile(filePath).then((data: string) =>
         {
+            console.debug('readFile from ' + filePath + ' success: ' + data);
+
             return this.deleteFile(filePath).then(() =>
             {
-                return delegate(data.toString(), serialNumber);
+                return delegate(data.toString());
             });
         }).catch((err: Error) =>
         {
