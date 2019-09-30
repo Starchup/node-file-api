@@ -90,7 +90,7 @@ export class FileWriter
             return true;
         }).catch((err: Error) =>
         {
-            console.error('FileWriter ' + fullPath + ' got appendFile error: ' + err.toString());
+            console.error('FileWriter ' + fullPath + ' got appendFile error: ' + err.toString() + ' with full data ' + data);
             return false;
         });
     }
