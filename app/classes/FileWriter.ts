@@ -81,16 +81,17 @@ export class FileWriter
         {
             if (err) throw new Error(err.toString());
 
+            console.debug('FileWriter renaming ' + fullTempPath + ' to ' + fullPath);
             return this.fsp.rename(fullTempPath, fullPath);
         }).then((err: Error) =>
         {
             if (err) throw new Error(err.toString());
 
-            console.debug('writeFile to ' + fullPath + ' success: ' + data);
+            console.debug('FileWriter write to ' + fullPath + ' success: ' + data);
             return true;
         }).catch((err: Error) =>
         {
-            console.error('FileWriter ' + fullPath + ' got appendFile error: ' + err.toString() + ' with full data ' + data);
+            console.error('FileWriter write to ' + fullPath + ' error: ' + err.toString() + ' with full data ' + data);
             return false;
         });
     }

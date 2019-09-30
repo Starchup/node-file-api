@@ -64,15 +64,16 @@ export class FileWatcher
 
         this.readFile(filePath).then((data: string) =>
         {
-            console.debug('readFile from ' + filePath + ' success: ' + data);
+            console.debug('FileWatcher read from ' + filePath + ' success: ' + data);
 
             return this.deleteFile(filePath).then(() =>
             {
+                console.debug('FileWatcher deleted ' + filePath);
                 return delegate(data.toString(), serialNumber);
             });
         }).catch((err: Error) =>
         {
-            console.error('FileWatcher ' + filePath + ' got error: ' + err.toString());
+            console.error('FileWatcher read from ' + filePath + ' error: ' + err.toString());
         });
     }
 
