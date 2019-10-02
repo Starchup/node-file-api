@@ -91,8 +91,16 @@ export class FileWriter
             return true;
         }).catch((err: Error) =>
         {
-            console.error('FileWriter write to ' + fullPath + ' error: ' + err.toString() + ' with full data ' + data);
-            return false;
+            if (err.message.indexOf('no such file or directory') > -1)
+            {
+                console.info('FileWriter wrote but file disapeared too quick: ' + fullPath + ' ' + data);
+                return true;
+            }
+            else
+            {
+                console.error('FileWriter write to ' + fullPath + ' error: ' + err.toString() + ' with full data ' + data);
+                return false;
+            }
         });
     }
 }
