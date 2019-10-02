@@ -70,7 +70,7 @@ export class FileWatcher
             });
         }).catch((err: Error) =>
         {
-            console.error('FileWatcher ' + filePath + ' got error: ' + err.toString());
+            console.error('FileWatcher read from ' + filePath + ' error: ' + err.toString());
         });
     }
 
