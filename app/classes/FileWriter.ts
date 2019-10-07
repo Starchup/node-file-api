@@ -92,7 +92,7 @@ export class FileWriter
             if (err.message.indexOf('no such file or directory') > -1)
             {
                 console.info('FileWriter wrote but file disapeared too quick: ' + fullPath + ' ' + data);
-                return true;
+                return this.writeFile(data);
             }
             else
             {
