@@ -49,6 +49,7 @@ declare var process:
 		NODE_ENV: string,
 		FILE_API_PORT: number,
 		GCLOUD_PROJECT: string,
+		WAKE_TOPIC: string,
 		FILE_API_DIRECTORY: string
 	}
 }
@@ -56,6 +57,7 @@ declare var process:
 if (!process.env.NODE_ENV || process.env.NODE_ENV.length < 1) throw new Error('NODE_ENV is required');
 if (!process.env.FILE_API_PORT || process.env.FILE_API_PORT < 0) throw new Error('FILE_API_PORT is required');
 if (!process.env.GCLOUD_PROJECT || process.env.GCLOUD_PROJECT.length < 1) throw new Error('GCLOUD_PROJECT is required');
+if (!process.env.WAKE_TOPIC || process.env.WAKE_TOPIC.length < 1) throw new Error('WAKE_TOPIC is required');
 if (!process.env.FILE_API_DIRECTORY || process.env.FILE_API_DIRECTORY.length < 1) throw new Error('FILE_API_DIRECTORY is required');
 
 /**
@@ -157,3 +159,6 @@ const filePath = function (fileName: string): string
 {
 	return process.env.FILE_API_DIRECTORY + '/' + fileName;
 }
+
+emitter.send(process.env.WAKE_TOPIC,
+{});
