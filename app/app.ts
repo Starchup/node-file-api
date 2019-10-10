@@ -160,5 +160,8 @@ const filePath = function (fileName: string): string
 	return process.env.FILE_API_DIRECTORY + '/' + fileName;
 }
 
-emitter.send(process.env.WAKE_TOPIC,
-{});
+setTimeout(() =>
+{
+	emitter.send(process.env.WAKE_TOPIC,
+	{});
+}, 5000); //5s delay after launch to give time to the other pod to be fully terminated
