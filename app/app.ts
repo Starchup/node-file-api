@@ -115,6 +115,8 @@ const server = new Server(process.env.FILE_API_PORT, (request: any) =>
 	//   for the specified username & password
 	if (request.method === 'POST' && request.url.indexOf('/setupShare') > -1)
 	{
+		console.debug('Request to setup share: ' + JSON.stringify(request.body));
+
 		if (!request.body.directory) throw new Error('setupShare requires directory');
 		if (!request.body.filename) throw new Error('setupShare requires filename');
 		if (!request.body.username) throw new Error('setupShare requires username');
