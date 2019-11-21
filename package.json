@@ -1,25 +1,22 @@
 {
-	"name": "node-file-api",
-	"version": "1.1.0",
-	"description": "RESTful API to file IO",
-	"main": "build/app.js",
-	"scripts":
-	{
-		"tsc": "tsc",
-		"dev": "ts-node-dev --respawn --transpileOnly ./app/app.ts",
-		"prod": "tsc && node ./build/app.js"
-	},
-	"author": "",
-	"license": "ISC",
-	"dependencies":
-	{
-		"@types/node": "11.13.0",
-		"google-pubsub-wrapper": "2.0.x",
-		"moment": "2.24.0"
-	},
-	"devDependencies":
-	{
-		"ts-node-dev": "1.0.0-pre.32",
-		"typescript": "3.3.4000"
-	}
+  "name": "node-file-api",
+  "version": "1.2.0",
+  "description": "RESTful API to file IO",
+  "main": "build/app.js",
+  "scripts": {
+    "tsc": "tsc",
+    "dev": "ts-node-dev --respawn --transpileOnly ./app/app.ts",
+    "prod": "tsc && node ./build/app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "11.13.0",
+    "google-pubsub-wrapper": "2.0.x",
+    "moment": "2.24.0"
+  },
+  "devDependencies": {
+    "ts-node-dev": "1.0.0-pre.32",
+    "typescript": "3.3.4000"
+  }
 }
