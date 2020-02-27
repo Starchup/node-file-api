@@ -14,7 +14,7 @@
   "dependencies":
   {
     "@types/node": "11.13.0",
-    "google-pubsub-wrapper": "git+https://github.com/Starchup/google-pubsub-wrapper.git#v0",
+    "google-pubsub-wrapper": "2.1.x",
     "moment": "2.24.0"
   },
   "devDependencies":
