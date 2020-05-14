@@ -14,7 +14,7 @@
   "dependencies":
   {
     "@types/node": "13.13.5",
-    "google-pubsub-wrapper": "2.2.x",
+    "google-pubsub-wrapper": "2.3.x",
     "moment": "2.25.3"
   },
   "devDependencies":
